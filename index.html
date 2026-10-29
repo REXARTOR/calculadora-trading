@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Lotaje Institucional | Gestión de Riesgo</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            margin: 0;
+        }
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            padding: 28px; 
+            width: 100%;
+            max-width: 440px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+        }
+        .badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        h2 { font-size: 1.25rem; font-weight: 600; margin: 0 0 4px 0; }
+        .subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+        select, input { 
+            width: 100%; 
+            background: #1f2937; 
+            border: 1px solid #374151; 
+            color: #fff; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            box-sizing: border-box; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus, input:focus { border-color: var(--accent-color); }
+        .result-box { 
+            background: #0f172a; 
+            border: 1px solid #0369a1; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-top: 24px; 
+            text-align: center; 
+        }
+        .result-value { font-size: 1.8rem; font-weight: bold; color: var(--accent-color); margin-top: 4px; }
+        .result-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .risk-text { font-size: 0.85rem; color: #cbd5e1; margin-top: 12px; border-top: 1px solid #1e293b; padding-top: 12px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">⚡ Gestión Cuantitativa de Riesgo</div>
+        <h2>Calculadora de Lotaje Institucional</h2>
+        <div class="subtitle">Dimensión exacta basada en control de riesgo riguroso</div>
+        
+        <div class="input-group">
+            <label>Activo Financiero</label>
+            <select id="asset" onchange="actualizarLabelSL(); calcular();">
+                <option value="EURUSD">EURUSD (Forex)</option>
+                <option value="XAUUSD" selected>XAUUSD (Oro - Onzas)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Capital Actual de la Cuenta ($)</label>
+            <input type="number" id="capital" value="10000" min="1" step="any" oninput="calcular()">
+        </div>
+
+        <div class="input-group">
+            <label>Riesgo Objetivo (%)</label>
+            <input type="number" id="riskPct" value="1.0" min="0.1" max="100" step="0.1" oninput="calcular()">
+        </div>
+
+        <div class="input-group">
+            <label id="labelSl">Distancia Stop Loss (Distancia en $ del Precio)</label>
+            <input type="number" id="slPips" value="3.00" min="0.01" step="any" oninput="calcular()">
+        </div>
+
+        <div class="result-box">
+            <div class="result-label">Tamaño de Lote Óptimo</div>
+            <div class="result-value" id="lotSize">0.00 Lotes</div>
+            <div class="risk-text">
+                <span id="riskAmount">Riesgo: $100.00 (1.0%)</span>
+                <span id="assetInfo">XAUUSD</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function actualizarLabelSL() {
+            const asset = document.getElementById('asset').value;
+            const label = document.getElementById('labelSl');
+            if (asset === 'EURUSD') {
+                label.innerText = "Distancia Stop Loss (Pips)";
+                if (document.getElementById('slPips').value == "3.00") document.getElementById('slPips').value = "25";
+            } else {
+                label.innerText = "Distancia Stop Loss (Distancia en $ del Precio)";
+                if (document.getElementById('slPips').value == "25") document.getElementById('slPips').value = "3.00";
+            }
+        }
+
+        function calcular() {
+            const asset = document.getElementById('asset').value;
+            const capital = parseFloat(document.getElementById('capital').value) || 0;
+            const riskPct = parseFloat(document.getElementById('riskPct').value) || 0;
+            const slDistancia = parseFloat(document.getElementById('slPips').value) || 0;
+
+            if (capital <= 0 || riskPct <= 0 || slDistancia <= 0) {
+                document.getElementById('lotSize').innerText = "0.00 Lotes";
+                document.getElementById('riskAmount').innerText = "Valores inválidos";
+                return;
+            }
+
+            const riesgoDolares = capital * (riskPct / 100);
+            document.getElementById('riskAmount').innerText = `Riesgo: $${riesgoDolares.toFixed(2)} (${riskPct}%)`;
+            document.getElementById('assetInfo').innerText = asset;
+
+            let lotes = 0;
+
+            if (asset === 'EURUSD') {
+                // EURUSD: 1 lote estándar = 100,000 unidades. 1 pip standard = $10 por lote por pip.
+                // slDistancia son pips (ej. 25 pips).
+                const valorPipLoteEstándar = 10; 
+                lotes = riesgoDolares / (slDistancia * valorPipLoteEstándar);
+            } else {
+                // XAUUSD: 1 lote estándar = 100 oz. Cada $1.00 de movimiento en el precio del oro por 1 lote = $100.
+                // slDistancia es la diferencia en dólares de la cotización (ej. $3.00 de SL).
+                const valorDolarMovimientoLoteEstándar = 100; 
+                lotes = riesgoDolares / (slDistancia * valorDolarMovimientoLoteEstándar);
+            }
+            
+            document.getElementById('lotSize').innerText = `${Math.max(0.01, lotes).toFixed(2)} Lotes`;
+        }
+
+        // Ejecutar al iniciar
+        actualizarLabelSL();
+        calcular();
+    </script>
+</body>
+</html>
