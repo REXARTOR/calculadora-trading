@@ -47,7 +47,7 @@
         <button id="resetBtn" class="text-xs text-gray-400 hover:text-white transition">Restaurar</button>
       </div>
 
-      <!-- Asset Selection Buttons -->
+      <!-- Asset Selection Buttons (Control Manual) -->
       <div>
         <label class="text-xs font-medium text-gray-400 mb-2 block uppercase tracking-wider">Activo</label>
         <div class="grid grid-cols-2 gap-3">
@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <!-- Account Balance (Conectado dinámicamente) -->
+      <!-- Account Balance -->
       <div>
         <div class="flex justify-between mb-1">
           <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Balance de Cuenta ($)</label>
@@ -165,98 +165,4 @@
     function setAsset(asset) {
       currentAsset = asset;
       const btnXau = document.getElementById('btnXau');
-      const btnEur = document.getElementById('btnEur');
-      const badge = document.getElementById('assetBadge');
-      const entryInput = document.getElementById('entryPrice');
-      const stopInput = document.getElementById('stopPrice');
-
-      if (asset === 'XAUUSD') {
-        btnXau.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs";
-        btnEur.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs";
-        badge.innerText = 'XAUUSD';
-        badge.className = "text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20";
-        entryInput.value = "2650.50";
-        stopInput.value = "2647.50";
-      } else {
-        btnEur.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs";
-        btnXau.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs";
-        badge.innerText = 'EURUSD';
-        badge.className = "text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20";
-        entryInput.value = "1.08500";
-        stopInput.value = "1.08300";
-      }
-      calculate();
-    }
-
-    function calculate() {
-      const capital = parseFloat(document.getElementById('capital').value) || 0;
-      const riskPct = parseFloat(document.getElementById('riskPct').value) || 0;
-      const entry = parseFloat(document.getElementById('entryPrice').value) || 0;
-      const stop = parseFloat(document.getElementById('stopPrice').value) || 0;
-
-      const riskUSD = capital * (riskPct / 100);
-      document.getElementById('riskUSD').innerText = `$${riskUSD.toFixed(2)}`;
-      document.getElementById('riskAmountVal').innerText = `$${riskUSD.toFixed(2)}`;
-
-      const dist = Math.abs(entry - stop);
-
-      let lots = 0.01;
-      let distText = "";
-      let unitsText = "";
-
-      if (currentAsset === 'XAUUSD') {
-        const pips = (dist * 10).toFixed(0);
-        distText = `$${dist.toFixed(2)} (${pips} Pips)`;
-        lots = dist > 0 ? riskUSD / (dist * 100) : 0.01;
-        lots = Math.max(0.01, lots);
-        lots = Math.round(lots * 100) / 100;
-
-        const oz = lots * 100;
-        unitsText = `${oz.toFixed(2)} oz`;
-      } else {
-        const pips = (dist * 10000).toFixed(1);
-        distText = `${pips} Pips`;
-        lots = dist > 0 ? riskUSD / (pips * 10) : 0.01;
-        lots = Math.max(0.01, lots);
-        lots = Math.round(lots * 100) / 100;
-
-        const units = lots * 100000;
-        unitsText = `${units.toLocaleString()} EUR`;
-      }
-
-      document.getElementById('distVal').innerText = distText;
-      document.getElementById('lotResult').innerText = lots.toFixed(2);
-      document.getElementById('unitsVal').innerText = unitsText;
-    }
-
-    document.getElementById('capital').addEventListener('input', calculate);
-    document.getElementById('entryPrice').addEventListener('input', calculate);
-    document.getElementById('stopPrice').addEventListener('input', calculate);
-
-    const slider = document.getElementById('riskSlider');
-    const pctInput = document.getElementById('riskPct');
-
-    slider.addEventListener('input', (e) => {
-      pctInput.value = e.target.value;
-      calculate();
-    });
-
-    pctInput.addEventListener('input', (e) => {
-      slider.value = e.target.value;
-      calculate();
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      obtenerBalanceReal();
-      document.getElementById('riskPct').value = 1.0;
-      slider.value = 1.0;
-      setAsset('XAUUSD');
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      obtenerBalanceReal();
-      calculate();
-    });
-  </script>
-</body>
-</html>
+      const btnEur = document.
