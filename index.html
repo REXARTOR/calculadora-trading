@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Institutional Risk Calculator — cTrader API</title>
+  <title>iREX — Calculadora de Riesgo Institucional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -14,69 +14,69 @@
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: 2px solid #ffffff; }
   </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-12 flex flex-col items-center">
 
-  <div class="max-w-xl mx-auto px-4 pt-6">
+  <div class="w-full max-w-md px-4 pt-6 space-y-4">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white">Institutional Risk Calculator</h1>
-          <p class="text-xs text-gray-400">Precision Position Sizing & Capital Preservation Dashboard</p>
-        </div>
+    <div class="flex items-center justify-between bg-[#131822] p-4 rounded-2xl border border-slate-800">
+      <div class="flex items-center space-x-2">
+        <span class="text-blue-400 font-bold text-lg">⚖️</span>
+        <h1 class="font-bold text-lg tracking-wide text-white">iREX <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">Calculadora</span></h1>
       </div>
-      <span class="text-[11px] font-mono px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">cTrader API v2.4</span>
+      <div id="status-badge" class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+        <span id="status-text" class="text-xs font-medium text-red-400">Desconectado</span>
+      </div>
     </div>
 
     <!-- Status Banner -->
-    <div class="mb-6 px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
+    <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-gray-300 font-medium">Oracle Cloud Instance: <span class="text-emerald-400">Active</span></span>
+        <span class="text-gray-300 font-medium">Oracle Cloud: <span id="cloud-status" class="text-emerald-400">Conectado</span></span>
       </div>
+      <span class="text-gray-400 font-mono text-[11px]">cTrader Sync</span>
     </div>
 
     <!-- Parameters Card -->
-    <div class="glass-card rounded-2xl p-5 mb-6 shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
+    <div class="glass-card rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center">
         <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase flex items-center gap-2">
-          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-          Parameters Setup
+          📊 Parámetros de Riesgo
         </h2>
-        <button id="resetBtn" class="text-xs text-gray-400 hover:text-white transition">Reset</button>
+        <button id="resetBtn" class="text-xs text-gray-400 hover:text-white transition">Restaurar</button>
       </div>
 
       <!-- Asset Selection Buttons -->
-      <label class="text-xs font-medium text-gray-400 mb-2 block uppercase tracking-wider">Select Asset</label>
-      <div class="grid grid-cols-2 gap-3 mb-5">
-        <button id="btnXau" onclick="setAsset('XAUUSD')" class="py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition">
-          <span>🪙 XAUUSD (Gold)</span>
-        </button>
-        <button id="btnEur" onclick="setAsset('EURUSD')" class="py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition">
-          <span>💶 EURUSD (Forex)</span>
-        </button>
+      <div>
+        <label class="text-xs font-medium text-gray-400 mb-2 block uppercase tracking-wider">Activo</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button id="btnXau" onclick="setAsset('XAUUSD')" class="py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs">
+            <span>🪙 XAUUSD</span>
+          </button>
+          <button id="btnEur" onclick="setAsset('EURUSD')" class="py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs">
+            <span>💶 EURUSD</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Account Balance -->
-      <div class="mb-4">
+      <!-- Account Balance (Conectado dinámicamente) -->
+      <div>
         <div class="flex justify-between mb-1">
-          <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Account Balance ($)</label>
-          <span class="text-xs text-gray-500 font-mono">USD Account</span>
+          <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Balance de Cuenta ($)</label>
+          <span id="sync-label" class="text-xs text-slate-500 font-mono">Cargando cTrader...</span>
         </div>
         <div class="relative">
           <span class="absolute left-3.5 top-2.5 text-gray-500 font-mono">$</span>
-          <input type="number" id="capital" value="10000" class="w-full bg-gray-900/80 border border-gray-800 rounded-xl py-2.5 pl-8 pr-4 text-white font-mono focus:outline-none focus:border-blue-500 transition">
+          <input type="number" id="capital" value="1000" class="w-full bg-gray-900/80 border border-gray-800 rounded-xl py-2.5 pl-8 pr-4 text-white font-mono focus:outline-none focus:border-blue-500 transition">
         </div>
       </div>
 
       <!-- Risk Percentage -->
-      <div class="mb-5">
+      <div>
         <div class="flex justify-between mb-1">
-          <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Risk Per Trade (%)</label>
-          <span id="riskUSD" class="text-xs font-mono text-blue-400">$100.00</span>
+          <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Riesgo por Operación (%)</label>
+          <span id="riskUSD" class="text-xs font-mono text-blue-400">$10.00</span>
         </div>
         <div class="flex items-center gap-3">
           <input type="range" id="riskSlider" min="0.1" max="5.0" step="0.1" value="1.0" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer">
@@ -85,87 +85,82 @@
       </div>
 
       <!-- Prices -->
-      <div class="grid grid-cols-2 gap-3 mb-3">
+      <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="text-xs font-medium text-gray-400 mb-1 block uppercase tracking-wider">Entry Price</label>
+          <label class="text-xs font-medium text-gray-400 mb-1 block uppercase tracking-wider">Precio Entrada</label>
           <input type="number" id="entryPrice" value="2650.50" step="0.01" class="w-full bg-gray-900/80 border border-gray-800 rounded-xl py-2.5 px-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500 transition">
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-400 mb-1 block uppercase tracking-wider">Stop Loss Price</label>
+          <label class="text-xs font-medium text-gray-400 mb-1 block uppercase tracking-wider">Stop Loss</label>
           <input type="number" id="stopPrice" value="2647.50" step="0.01" class="w-full bg-gray-900/80 border border-gray-800 rounded-xl py-2.5 px-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500 transition">
         </div>
       </div>
 
       <!-- Distance Info -->
       <div class="p-3 rounded-xl bg-gray-900/50 border border-gray-800/80 flex justify-between items-center text-xs">
-        <span class="text-gray-400 flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          Stop Loss Distance:
-        </span>
+        <span class="text-gray-400">Distancia Stop Loss:</span>
         <span id="distVal" class="font-mono text-white font-medium">$3.00 (30 Pips)</span>
-      </div>
-
-      <div class="flex justify-between items-center mt-3 pt-2 text-[10px] text-gray-500 font-mono">
-        <span>Algorithm: riesgo.py</span>
-        <span>Format: Standard Lots</span>
       </div>
     </div>
 
     <!-- Calculated Output Card -->
-    <div class="glass-card rounded-2xl p-6 mb-6 glow-accent border-blue-500/30 relative overflow-hidden">
-      <div class="flex justify-between items-start mb-2">
+    <div class="glass-card rounded-2xl p-5 glow-accent border-blue-500/30 relative overflow-hidden space-y-4">
+      <div class="flex justify-between items-start">
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-          <span class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Calculated Standard Volume</span>
+          <span class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Volumen Estándar Calculado</span>
         </div>
         <span id="assetBadge" class="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">XAUUSD</span>
       </div>
 
-      <div class="my-4">
+      <div>
         <div class="flex items-baseline gap-2">
-          <span id="lotResult" class="text-5xl font-extrabold text-white font-mono tracking-tight">0.33</span>
-          <span class="text-xl font-medium text-gray-400">Lots</span>
+          <span id="lotResult" class="text-4xl font-extrabold text-white font-mono tracking-tight">0.03</span>
+          <span class="text-lg font-medium text-gray-400">Lotes</span>
         </div>
-        <p class="text-xs text-gray-400 mt-2">Rounded to 2 decimal places (0.01 lot step size) according to broker specifications.</p>
+        <p class="text-[11px] text-gray-400 mt-1">Sincronizado automáticamente con el balance de tu cTrader.</p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 pt-4 border-t border-gray-800">
+      <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-800">
         <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
-          <span class="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Risk Amount</span>
-          <span id="riskAmountVal" class="text-sm font-mono text-rose-400 font-bold">$100.00</span>
+          <span class="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Monto en Riesgo</span>
+          <span id="riskAmountVal" class="text-sm font-mono text-rose-400 font-bold">$10.00</span>
         </div>
         <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
-          <span class="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Contract Units</span>
-          <span id="unitsVal" class="text-sm font-mono text-white font-bold">33.33 oz</span>
+          <span class="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Unidades</span>
+          <span id="unitsVal" class="text-sm font-mono text-white font-bold">3.33 oz</span>
         </div>
-      </div>
-
-      <div class="mt-3 p-3 rounded-xl bg-gray-900/60 border border-gray-800">
-        <span class="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Notional Value</span>
-        <span id="notionalVal" class="text-sm font-mono text-blue-400 font-bold">$88,350.00</span>
       </div>
     </div>
-
-    <!-- Terminal Visualizer -->
-    <div class="glass-card rounded-2xl p-4 mb-6">
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Oracle Cloud Terminal Execution Output</span>
-        </div>
-      </div>
-      <div class="bg-black/80 rounded-xl p-4 font-mono text-xs text-gray-300 border border-gray-800/80 space-y-1 overflow-x-auto">
-        <p class="text-gray-500">(venv) ubuntu@irex:~/trading-bot$ python3 main.py</p>
-        <p class="text-emerald-400">Bot iniciado con gestión de riesgo institucional.</p>
-        <p id="termLine1">[XAUUSD] Entrada: 2650.5 | SL: 2647.5 | Distancia: 3.0000</p>
-        <p id="termLine2" class="text-amber-300 font-bold">👉 Lotaje calculado automáticamente para cTrader: 0.33 Lotes</p>
-      </div>
-    </div>
-
   </div>
 
   <script>
+    const API_BASE_URL = 'https://atomic-threshold-humidity-builds.trycloudflare.com';
     let currentAsset = 'XAUUSD';
+
+    async function obtenerBalanceReal() {
+      try {
+        const response = await fetch(API_BASE_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Fallo de red');
+        const data = await response.json();
+
+        if (data.bot_status === "online" && data.account && data.account.balance !== undefined) {
+          document.getElementById('capital').value = data.account.balance;
+          document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+          document.getElementById('status-text').textContent = "Conectado";
+          document.getElementById('status-text').className = "text-xs font-medium text-emerald-400";
+          document.getElementById('sync-label').textContent = "Real cTrader";
+          document.getElementById('sync-label').className = "text-xs text-emerald-400 font-mono";
+          calculate();
+        }
+      } catch (e) {
+        document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-red-500";
+        document.getElementById('status-text').textContent = "Sin conexión";
+        document.getElementById('status-text').className = "text-xs font-medium text-red-400";
+        document.getElementById('sync-label').textContent = "Manual";
+        document.getElementById('sync-label').className = "text-xs text-amber-400 font-mono";
+      }
+    }
 
     function setAsset(asset) {
       currentAsset = asset;
@@ -176,15 +171,15 @@
       const stopInput = document.getElementById('stopPrice');
 
       if (asset === 'XAUUSD') {
-        btnXau.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition";
-        btnEur.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition";
+        btnXau.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs";
+        btnEur.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs";
         badge.innerText = 'XAUUSD';
         badge.className = "text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20";
         entryInput.value = "2650.50";
         stopInput.value = "2647.50";
       } else {
-        btnEur.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition";
-        btnXau.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition";
+        btnEur.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs";
+        btnXau.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs";
         badge.innerText = 'EURUSD';
         badge.className = "text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20";
         entryInput.value = "1.08500";
@@ -208,7 +203,6 @@
       let lots = 0.01;
       let distText = "";
       let unitsText = "";
-      let notional = 0;
 
       if (currentAsset === 'XAUUSD') {
         const pips = (dist * 10).toFixed(0);
@@ -219,7 +213,6 @@
 
         const oz = lots * 100;
         unitsText = `${oz.toFixed(2)} oz`;
-        notional = oz * entry;
       } else {
         const pips = (dist * 10000).toFixed(1);
         distText = `${pips} Pips`;
@@ -229,20 +222,13 @@
 
         const units = lots * 100000;
         unitsText = `${units.toLocaleString()} EUR`;
-        notional = units * entry;
       }
 
       document.getElementById('distVal').innerText = distText;
       document.getElementById('lotResult').innerText = lots.toFixed(2);
       document.getElementById('unitsVal').innerText = unitsText;
-      document.getElementById('notionalVal').innerText = `$${notional.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-
-      // Terminal simulation sync
-      document.getElementById('termLine1').innerText = `[${currentAsset}] Entrada: ${entry} | SL: ${stop} | Distancia: ${dist.toFixed(4)}`;
-      document.getElementById('termLine2').innerText = `👉 Lotaje calculado automáticamente para cTrader: ${lots.toFixed(2)} Lotes`;
     }
 
-    // Event listeners
     document.getElementById('capital').addEventListener('input', calculate);
     document.getElementById('entryPrice').addEventListener('input', calculate);
     document.getElementById('stopPrice').addEventListener('input', calculate);
@@ -261,13 +247,16 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      document.getElementById('capital').value = 10000;
+      obtenerBalanceReal();
       document.getElementById('riskPct').value = 1.0;
       slider.value = 1.0;
       setAsset('XAUUSD');
     });
 
-    calculate();
+    document.addEventListener('DOMContentLoaded', () => {
+      obtenerBalanceReal();
+      calculate();
+    });
   </script>
 </body>
 </html>
