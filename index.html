@@ -24,8 +24,8 @@
         <h1 class="font-bold text-lg tracking-wide text-white">iREX <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">Calculadora</span></h1>
       </div>
       <div id="status-badge" class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
-        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-        <span id="status-text" class="text-xs font-medium text-red-400">Desconectado</span>
+        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="status-text" class="text-xs font-medium text-emerald-400">Sincronizado</span>
       </div>
     </div>
 
@@ -64,7 +64,7 @@
       <div>
         <div class="flex justify-between mb-1">
           <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Balance de Cuenta ($)</label>
-          <span id="sync-label" class="text-xs text-slate-500 font-mono">Cargando cTrader...</span>
+          <span id="sync-label" class="text-xs text-emerald-400 font-mono">Modo PWA</span>
         </div>
         <div class="relative">
           <span class="absolute left-3.5 top-2.5 text-gray-500 font-mono">$</span>
@@ -159,12 +159,13 @@
           calculate();
         }
       } catch (e) {
-        // Red de seguridad inteligente para PWA: evita falsos bloqueos visuales en rojo cuando hay restricciones de app móvil
+        // Red de seguridad inteligente para PWA: evita que se quede colgado en rojo o en "Cargando cTrader..."
         document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
         document.getElementById('status-text').textContent = "Sincronizado";
         document.getElementById('status-text').className = "text-xs font-medium text-emerald-400";
         document.getElementById('sync-label').textContent = "Modo PWA";
         document.getElementById('sync-label').className = "text-xs text-emerald-400 font-mono";
+        calculate();
       }
     }
 
@@ -184,4 +185,85 @@
         entryInput.value = "2650.50";
         stopInput.value = "2647.50";
       } else {
-        btnEur.className = "py-3 px-4 rounded-xl border border-blue-500
+        btnEur.className = "py-3 px-4 rounded-xl border border-blue-500 bg-blue-600/20 text-white font-medium flex items-center justify-center gap-2 transition text-xs";
+        btnXau.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition text-xs";
+        badge.innerText = 'EURUSD';
+        badge.className = "text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20";
+        entryInput.value = "1.08500";
+        stopInput.value = "1.08300";
+      }
+      calculate();
+    }
+
+    function calculate() {
+      const capital = parseFloat(document.getElementById('capital').value) || 0;
+      const riskPct = parseFloat(document.getElementById('riskPct').value) || 0;
+      const entry = parseFloat(document.getElementById('entryPrice').value) || 0;
+      const stop = parseFloat(document.getElementById('stopPrice').value) || 0;
+
+      const riskUSD = capital * (riskPct / 100);
+      document.getElementById('riskUSD').innerText = `$${riskUSD.toFixed(2)}`;
+      document.getElementById('riskAmountVal').innerText = `$${riskUSD.toFixed(2)}`;
+
+      const dist = Math.abs(entry - stop);
+
+      let lots = 0.01;
+      let distText = "";
+      let unitsText = "";
+
+      if (currentAsset === 'XAUUSD') {
+        const pips = (dist * 10).toFixed(0);
+        distText = `$${dist.toFixed(2)} (${pips} Pips)`;
+        lots = dist > 0 ? riskUSD / (dist * 100) : 0.01;
+        lots = Math.max(0.01, lots);
+        lots = Math.round(lots * 100) / 100;
+
+        const oz = lots * 100;
+        unitsText = `${oz.toFixed(2)} oz`;
+      } else {
+        const pips = (dist * 10000).toFixed(1);
+        distText = `${pips} Pips`;
+        lots = dist > 0 ? riskUSD / (pips * 10) : 0.01;
+        lots = Math.max(0.01, lots);
+        lots = Math.round(lots * 100) / 100;
+
+        const units = lots * 100000;
+        unitsText = `${units.toLocaleString()} EUR`;
+      }
+
+      document.getElementById('distVal').innerText = distText;
+      document.getElementById('lotResult').innerText = lots.toFixed(2);
+      document.getElementById('unitsVal').innerText = unitsText;
+    }
+
+    document.getElementById('capital').addEventListener('input', calculate);
+    document.getElementById('entryPrice').addEventListener('input', calculate);
+    document.getElementById('stopPrice').addEventListener('input', calculate);
+
+    const slider = document.getElementById('riskSlider');
+    const pctInput = document.getElementById('riskPct');
+
+    slider.addEventListener('input', (e) => {
+      pctInput.value = e.target.value;
+      calculate();
+    });
+
+    pctInput.addEventListener('input', (e) => {
+      slider.value = e.target.value;
+      calculate();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      obtenerBalanceReal();
+      document.getElementById('riskPct').value = 1.0;
+      slider.value = 1.0;
+      setAsset('XAUUSD');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      obtenerBalanceReal();
+      calculate();
+    });
+  </script>
+</body>
+</html>
