@@ -139,13 +139,18 @@
     let currentAsset = 'XAUUSD';
 
     async function obtenerBalanceReal() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
       try {
         const response = await fetch(API_BASE_URL, { 
           method: 'GET',
           mode: 'cors',
-          cache: 'no-store' 
+          cache: 'no-store',
+          signal: controller.signal
         });
         
+        clearTimeout(timeoutId);
         if (!response.ok) throw new Error('Fallo de red');
         const data = await response.json();
 
@@ -159,7 +164,7 @@
           calculate();
         }
       } catch (e) {
-        // Red de seguridad inteligente para PWA: evita que se quede colgado en rojo o en "Cargando cTrader..."
+        clearTimeout(timeoutId);
         document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
         document.getElementById('status-text').textContent = "Sincronizado";
         document.getElementById('status-text').className = "text-xs font-medium text-emerald-400";
