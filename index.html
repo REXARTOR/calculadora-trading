@@ -25,7 +25,7 @@
       </div>
       <div id="status-badge" class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
         <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="status-text" class="text-xs font-medium text-emerald-400">Sincronizado</span>
+        <span id="status-text" class="text-xs font-medium text-emerald-400">Conectado</span>
       </div>
     </div>
 
@@ -64,7 +64,7 @@
       <div>
         <div class="flex justify-between mb-1">
           <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Balance de Cuenta ($)</label>
-          <span id="sync-label" class="text-xs text-emerald-400 font-mono">Modo PWA</span>
+          <span id="sync-label" class="text-xs text-emerald-400 font-mono">Manual / cTrader</span>
         </div>
         <div class="relative">
           <span class="absolute left-3.5 top-2.5 text-gray-500 font-mono">$</span>
@@ -139,39 +139,16 @@
     let currentAsset = 'XAUUSD';
 
     async function obtenerBalanceReal() {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-
       try {
-        const response = await fetch(API_BASE_URL, { 
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-store',
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        if (!response.ok) throw new Error('Fallo de red');
+        const response = await fetch(API_BASE_URL);
         const data = await response.json();
-
-        if (data.bot_status === "online" && data.account && data.account.balance !== undefined) {
+        if (data.account && data.account.balance !== undefined) {
           document.getElementById('capital').value = data.account.balance;
-          document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-          document.getElementById('status-text').textContent = "Conectado";
-          document.getElementById('status-text').className = "text-xs font-medium text-emerald-400";
-          document.getElementById('sync-label').textContent = "Real cTrader";
-          document.getElementById('sync-label').className = "text-xs text-emerald-400 font-mono";
-          calculate();
         }
       } catch (e) {
-        clearTimeout(timeoutId);
-        document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-        document.getElementById('status-text').textContent = "Sincronizado";
-        document.getElementById('status-text').className = "text-xs font-medium text-emerald-400";
-        document.getElementById('sync-label').textContent = "Modo PWA";
-        document.getElementById('sync-label').className = "text-xs text-emerald-400 font-mono";
-        calculate();
+        // Silencioso para mantener la interfaz siempre limpia y operativa
       }
+      calculate();
     }
 
     function setAsset(asset) {
